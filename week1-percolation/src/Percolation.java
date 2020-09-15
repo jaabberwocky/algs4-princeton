@@ -2,30 +2,30 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    private boolean[] id;
+    private boolean[] openSites;
     private WeightedQuickUnionUF connectionGrid;
     private int gridSize;
 
-    // because top-left corner of the grid is (1,1)
+    // top-left corner of the grid is (1,1)
     private final int virtualTop = 0;
     private final int virtualBottom;
 
     // creates n-by-n grid with all sites initially blocked
     public Percolation(int n) {
-        if (n <= 0) throw new IllegalArgumentException("n must be positive"); // illegal argument
+        if (n <= 0) throw new IllegalArgumentException("n must be positive"); 
 
         gridSize = n;
-        virtualBottom = gridSize + 1;
-        id = new boolean[n + 1]; // use default value of 0 to set all sites to blocked
+        virtualBottom = (int) (Math.pow(gridSize, 2) + 1);
+        openSites = new boolean[n + 1]; // increment by 1 to include top
         connectionGrid = new WeightedQuickUnionUF(gridSize + 1); // account for virtualBottom too
     }
 
     // opens the site (row, col ) if it is not open already
     public void open(int row, int col) {
         int singleArrayRep = convertToSingleArray(row, col);
-        if (!id[singleArrayRep]) {
+        if (!openSites[singleArrayRep]) {
             // site is currently closed
-            id[singleArrayRep] = true;
+            openSites[singleArrayRep] = true;
             // check all sites around it and union them
 
             // above
@@ -56,8 +56,8 @@ public class Percolation {
 
     public int numberOfOpenSites() {
         int trueCount = 0;
-        for (int i = 1; i < id.length; i++) {
-            if (id[i]) trueCount++;
+        for (int i = 1; i < openSites.length; i++) {
+            if (openSites[i]) trueCount++;
         }
         return trueCount;
     }
@@ -69,7 +69,7 @@ public class Percolation {
 
     public boolean isOpen(int row, int col) {
         checkBounds(row, col);
-        return id[convertToSingleArray(row, col)];
+        return openSites[convertToSingleArray(row, col)];
     }
 
     public boolean percolates() {
